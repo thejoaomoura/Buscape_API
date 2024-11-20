@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // API Base URL
     const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:5173/api'
-        : `${window.location.origin}/api`;
+        : 'https://buscape-search-api.vercel.app/api';
 
     let currentProducts = [];
     let activeFiltersCount = 0;
