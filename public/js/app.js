@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const maxPrice = document.getElementById('maxPrice');
     const clearFilters = document.getElementById('clearFilters');
 
-    // API Base URL - Usa a URL atual em produção ou localhost em desenvolvimento
+    // API Base URL
     const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:5173/api'
         : `${window.location.origin}/api`;
