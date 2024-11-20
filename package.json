@@ -1,0 +1,24 @@
+{
+  "name": "buscape-price-api",
+  "version": "1.0.0",
+  "description": "API para webscraping do Buscapé",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "vercel-build": "echo 'Building...'"
+  },
+  "keywords": ["webscraping", "buscape", "api"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "axios": "^1.6.2",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
