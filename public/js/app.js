@@ -17,6 +17,38 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentProducts = [];
     let activeFiltersCount = 0;
 
+    // Carregar dados do localStorage ao iniciar
+    function loadFromLocalStorage() {
+        const savedData = localStorage.getItem('buscapeSearchData');
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            currentProducts = data.products || [];
+            searchInput.value = data.lastQuery || '';
+            priceSort.value = data.filters?.sort || '';
+            minPrice.value = data.filters?.minPrice || '';
+            maxPrice.value = data.filters?.maxPrice || '';
+            
+            if (currentProducts.length > 0) {
+                applyFiltersAndSort();
+            }
+        }
+    }
+
+    // Salvar dados no localStorage
+    function saveToLocalStorage(query) {
+        const dataToSave = {
+            products: currentProducts,
+            lastQuery: query,
+            filters: {
+                sort: priceSort.value,
+                minPrice: minPrice.value,
+                maxPrice: maxPrice.value
+            },
+            timestamp: new Date().getTime()
+        };
+        localStorage.setItem('buscapeSearchData', JSON.stringify(dataToSave));
+    }
+
     // Search Products
     async function searchProducts(query) {
         try {
@@ -29,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             currentProducts = data.products;
+            saveToLocalStorage(query);
             applyFiltersAndSort();
         } catch (error) {
             showError(error.message);
@@ -189,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (currentProducts.length > 0) {
             displayResults(currentProducts);
+            saveToLocalStorage(searchInput.value.trim());
         }
     }
 
@@ -209,9 +243,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Filtros e Ordenação
-    priceSort.addEventListener('change', applyFiltersAndSort);
-    minPrice.addEventListener('input', applyFiltersAndSort);
-    maxPrice.addEventListener('input', applyFiltersAndSort);
+    priceSort.addEventListener('change', () => {
+        if (currentProducts.length > 0) {
+            applyFiltersAndSort();
+            saveToLocalStorage(searchInput.value.trim());
+        }
+    });
+
+    minPrice.addEventListener('input', () => {
+        if (currentProducts.length > 0) {
+            applyFiltersAndSort();
+            saveToLocalStorage(searchInput.value.trim());
+        }
+    });
+
+    maxPrice.addEventListener('input', () => {
+        if (currentProducts.length > 0) {
+            applyFiltersAndSort();
+            saveToLocalStorage(searchInput.value.trim());
+        }
+    });
+
     clearFilters.addEventListener('click', resetFilters);
+
+    // Carregar dados salvos ao iniciar a página
+    loadFromLocalStorage();
 });
