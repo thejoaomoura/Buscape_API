@@ -63,3 +63,4 @@ build/
 
 # Arquivos do Vercel
 .vercel
+package-lock.json
