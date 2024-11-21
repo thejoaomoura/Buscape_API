@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Lucide icons first
+    lucide.createIcons();
+
     const searchInput = document.getElementById('searchInput');
     const searchButton = document.getElementById('searchButton');
     const loadingState = document.getElementById('loadingState');
@@ -8,6 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const minPrice = document.getElementById('minPrice');
     const maxPrice = document.getElementById('maxPrice');
     const clearFilters = document.getElementById('clearFilters');
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = themeToggle.querySelector('i');
 
     // API Base URL
     const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
@@ -225,6 +230,51 @@ document.addEventListener('DOMContentLoaded', () => {
             saveToLocalStorage(searchInput.value.trim());
         }
     }
+
+    // Manipulação de tema escuro/claro
+    function initializeTheme() {
+        const themeToggle = document.getElementById('themeToggle');
+        if (!themeToggle) {
+            console.error('Botão de tema não encontrado');
+            return;
+        }
+
+        // Set initial theme
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', currentTheme);
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        
+        // Update icon and button state
+        const updateThemeUI = (theme) => {
+            const themeIcon = themeToggle.querySelector('i');
+            if (themeIcon) {
+                // In light theme, show moon (to switch to dark)
+                // In dark theme, show sun (to switch to light)
+                const iconName = theme === 'dark' ? 'sun' : 'moon';
+                themeIcon.innerHTML = ''; // Clear previous icon
+                themeIcon.setAttribute('data-lucide', iconName);
+                themeToggle.classList.toggle('dark', theme === 'dark');
+                lucide.createIcons();
+            }
+        };
+
+        // Initial UI update
+        updateThemeUI(currentTheme);
+
+        // Theme toggle click handler
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.body.setAttribute('data-theme', newTheme);
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeUI(newTheme);
+        });
+    }
+
+    // Initialize theme
+    initializeTheme();
 
     // Event Listeners
     searchButton.addEventListener('click', () => {

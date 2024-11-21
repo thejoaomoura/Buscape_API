@@ -8,23 +8,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        .loading {
-            animation: pulse 1.5s infinite;
-        }
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-4px);
-        }
-    </style>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100 min-h-screen" data-theme="light">
+    <!-- Theme Toggle Button -->
+    <button id="themeToggle" class="theme-toggle" aria-label="Alternar tema">
+        <i data-lucide="sun"></i>
+    </button>
+
     <div class="container mx-auto px-4 py-8" x-data="{ 
         activeFilters: 0,
         sortBy: '',
@@ -312,10 +303,6 @@
         </div>
     </div>
 
-    <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
-    </script>
-    <script src="js/app.js"></script>
+    <script src="/js/app.js"></script>
 </body>
 </html>
