@@ -31,8 +31,8 @@ app.use((err, req, res, next) => {
 if (process.env.VERCEL) {
     module.exports = app;
 } else {
-    const PORT = process.env.PORT || 3000;
+    const PORT = process.env.PORT || 5173;
     app.listen(PORT, () => {
-        console.log(`Servidor rodando na porta ${PORT}`);
+        console.log(`Servidor rodando na porta http://localhost:${PORT}`);
     });
 }
