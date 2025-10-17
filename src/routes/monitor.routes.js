@@ -42,8 +42,14 @@ router.post('/', async (req, res) => {
             monitorId: result.id
         });
     } catch (error) {
-        console.error('Erro ao adicionar monitor:', error);
-        res.status(500).json({ error: 'Erro ao adicionar produto ao monitoramento' });
+        console.error('❌ Erro ao adicionar monitor:', error);
+        console.error('Detalhes do erro:', error.message);
+        console.error('Stack:', error.stack);
+        
+        res.status(500).json({ 
+            error: 'Erro ao adicionar produto ao monitoramento',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 });
 
