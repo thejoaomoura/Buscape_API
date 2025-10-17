@@ -159,14 +159,27 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             card.innerHTML = `
-                <!-- Imagem do produto -->
-                <div class="flex items-center justify-center h-48 w-full mb-4">
-                    <img 
-                        src="${product.image || 'https://via.placeholder.com/300x200'}" 
-                        alt="${product.name}"
-                        class="object-contain max-h-full max-w-full rounded-md"
-                        onerror="this.src='https://via.placeholder.com/300x200'"
-                    >
+                <!-- Imagem do produto com efeito Blurred do HeroUI -->
+                <div class="heroui-image-wrapper flex items-center justify-center h-48 w-full mb-4 relative overflow-hidden rounded-lg">
+                    <!-- Imagem de fundo borrada -->
+                    <div class="heroui-blurred-img absolute inset-0">
+                        <img 
+                            src="${product.image || 'https://via.placeholder.com/300x200'}" 
+                            alt=""
+                            class="w-full h-full object-cover blur-lg scale-110 opacity-70"
+                            onerror="this.src='https://via.placeholder.com/300x200'"
+                        >
+                    </div>
+                    <!-- Imagem principal -->
+                    <div class="heroui-img relative z-10">
+                        <img 
+                            src="${product.image || 'https://via.placeholder.com/300x200'}" 
+                            alt="${product.name}"
+                            class="object-contain max-h-44 max-w-full rounded-md product-img"
+                            onerror="this.src='https://via.placeholder.com/300x200'"
+                            loading="lazy"
+                        >
+                    </div>
                 </div>
                 <!-- Informações do produto -->
                 <div class="mt-2 text-center w-full">
@@ -180,19 +193,49 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="text-sm text-gray-500">Menor preço disponível</p>
                     <p class="text-2xl font-bold text-blue-600 mt-2">${product.price}</p>
                     ${product.installment ? `<p class="text-sm text-gray-500 mt-1">${product.installment}</p>` : ''}
-                    <button 
-                        onclick="window.open('${product.link}', '_blank')"
-                        class="mt-4 w-full bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors duration-300 flex items-center justify-center space-x-2"
-                    >
-                        <span>Ver Produto</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                    </button>
+                    <div class="mt-4 flex space-x-2">
+                        <button 
+                            onclick="window.openMonitorModal(${JSON.stringify(product).replace(/"/g, '&quot;')})"
+                            class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-full hover:from-purple-700 hover:to-pink-700 transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg"
+                            title="Monitorar preço deste produto"
+                        >
+                            <i data-lucide="bell" class="w-4 h-4"></i>
+                            <span>Monitorar</span>
+                        </button>
+                        <button 
+                            onclick="window.open('${product.link}', '_blank')"
+                            class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition-colors duration-300 flex items-center justify-center space-x-2"
+                        >
+                            <span>Ver Produto</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             `;
             resultsContainer.appendChild(card);
         });
+        
+        // Adicionar event listeners para remover shimmer quando imagens carregarem
+        setTimeout(() => {
+            const imageWrappers = document.querySelectorAll('.heroui-image-wrapper');
+            imageWrappers.forEach(wrapper => {
+                const img = wrapper.querySelector('.product-img');
+                if (img) {
+                    if (img.complete) {
+                        wrapper.classList.add('loaded');
+                    } else {
+                        img.addEventListener('load', () => {
+                            wrapper.classList.add('loaded');
+                        });
+                    }
+                }
+            });
+        }, 100);
+        
+        // Reinicializar os ícones do Lucide após adicionar os cards
+        lucide.createIcons();
     }
 
     // Show/Hide Loading State

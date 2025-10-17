@@ -3,6 +3,8 @@ const cors = require('cors');
 const path = require('path');
 const config = require('./config/config');
 const scraperRoutes = require('./routes/scraper.routes');
+const monitorRoutes = require('./routes/monitor.routes');
+const priceMonitorJob = require('./jobs/priceMonitor.job');
 
 const app = express();
 
@@ -15,6 +17,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // Rotas da API
 app.use('/api', scraperRoutes);
+app.use('/api/monitor', monitorRoutes);
 
 // Rota principal retorna o index.html
 app.get('/', (req, res) => {
@@ -34,5 +37,8 @@ if (process.env.VERCEL) {
     const PORT = process.env.PORT || 5173;
     app.listen(PORT, () => {
         console.log(`Servidor rodando na porta http://localhost:${PORT}`);
+        
+        // Iniciar cron job de monitoramento de preços
+        priceMonitorJob.start();
     });
 }

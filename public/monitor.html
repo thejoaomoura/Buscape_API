@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔔</text></svg>">
+    <title>Meus Produtos Monitorados - BuscapéAPI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- HeroUI V2 -->
+    <link rel="stylesheet" href="https://unpkg.com/@heroui/theme@latest/dist/index.css"/>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="bg-gray-100 min-h-screen" data-theme="light">
+    <!-- Theme Toggle Button -->
+    <button id="themeToggle" class="theme-toggle" aria-label="Alternar tema">
+        <i data-lucide="sun"></i>
+    </button>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <div class="flex items-center justify-between">
+                <div>
+                    <a href="/" class="inline-flex items-center text-blue-600 hover:text-blue-700 mb-4">
+                        <i data-lucide="arrow-left" class="w-5 h-5 mr-2"></i>
+                        Voltar para busca
+                    </a>
+                    <h1 class="text-4xl font-bold text-blue-600 mb-2">
+                        <i data-lucide="bell-ring" class="w-10 h-10 inline mr-2"></i>
+                        Produtos Monitorados
+                    </h1>
+                    <p class="text-gray-600">Acompanhe os preços dos produtos que você está monitorando</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Email Input Section -->
+        <div class="max-w-2xl mx-auto mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i data-lucide="mail" class="w-4 h-4 inline mr-1"></i>
+                    Digite seu e-mail para ver seus produtos monitorados
+                </label>
+                <div class="flex space-x-3">
+                    <input 
+                        type="email" 
+                        id="userEmailInput"
+                        placeholder="seu@email.com"
+                        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                    <button 
+                        id="loadMonitorsBtn"
+                        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-medium flex items-center space-x-2"
+                    >
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                        <span>Buscar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden text-center py-12">
+            <i data-lucide="loader" class="w-12 h-12 text-blue-600 mx-auto mb-4 animate-spin"></i>
+            <p class="text-gray-600">Carregando produtos monitorados...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-12">
+            <i data-lucide="inbox" class="w-20 h-20 text-gray-300 mx-auto mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">Nenhum produto monitorado</h3>
+            <p class="text-gray-500 mb-6">Você ainda não está monitorando nenhum produto.</p>
+            <a href="/" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all">
+                <i data-lucide="search" class="w-5 h-5 mr-2"></i>
+                Buscar Produtos
+            </a>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="hidden max-w-2xl mx-auto mb-8 p-4 bg-red-100 text-red-800 rounded-lg border border-red-200">
+            <!-- Error will be displayed here -->
+        </div>
+
+        <!-- Monitors Grid -->
+        <div id="monitorsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Monitor cards will be inserted here -->
+        </div>
+
+        <!-- Modal de Edição de Preço Alvo -->
+        <div 
+            id="editModal"
+            class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        >
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+                <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-2xl">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xl font-bold">Editar Preço Alvo</h3>
+                        <button onclick="closeEditModal()" class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-1">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <input type="hidden" id="editMonitorId">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Novo Preço Alvo (R$)</label>
+                    <input 
+                        type="number" 
+                        id="editTargetPrice"
+                        placeholder="0.00"
+                        step="0.01"
+                        min="0"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                    <div class="flex space-x-3 mt-6">
+                        <button 
+                            onclick="closeEditModal()"
+                            class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                        >
+                            Cancelar
+                        </button>
+                        <button 
+                            onclick="saveNewTargetPrice()"
+                            class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        >
+                            Salvar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2 pointer-events-none">
+            <!-- Toasts serão inseridos aqui -->
+        </div>
+    </div>
+
+    <script src="/js/monitor.js"></script>
+    <script>
+        let currentUserEmail = '';
+
+        // Initialize theme toggle
+        function initializeTheme() {
+            const themeToggle = document.getElementById('themeToggle');
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', currentTheme);
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            
+            const updateThemeUI = (theme) => {
+                const themeIcon = themeToggle.querySelector('i');
+                if (themeIcon) {
+                    const iconName = theme === 'dark' ? 'sun' : 'moon';
+                    themeIcon.setAttribute('data-lucide', iconName);
+                    themeToggle.classList.toggle('dark', theme === 'dark');
+                    lucide.createIcons();
+                }
+            };
+
+            updateThemeUI(currentTheme);
+
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.body.getAttribute('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                document.body.setAttribute('data-theme', newTheme);
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateThemeUI(newTheme);
+            });
+        }
+
+        initializeTheme();
+        lucide.createIcons();
+
+        // Load saved email on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedEmail = localStorage.getItem('userEmail');
+            if (savedEmail) {
+                document.getElementById('userEmailInput').value = savedEmail;
+                loadMonitors(savedEmail);
+            }
+        });
+
+        // Load monitors button
+        document.getElementById('loadMonitorsBtn').addEventListener('click', () => {
+            const email = document.getElementById('userEmailInput').value.trim();
+            if (email) {
+                loadMonitors(email);
+            }
+        });
+
+        // Load monitors function
+        async function loadMonitors(email) {
+            currentUserEmail = email;
+            const loadingState = document.getElementById('loadingState');
+            const emptyState = document.getElementById('emptyState');
+            const errorMessage = document.getElementById('errorMessage');
+            const container = document.getElementById('monitorsContainer');
+
+            loadingState.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            container.innerHTML = '';
+
+            try {
+                const monitors = await window.loadMonitoredProducts(email);
+                loadingState.classList.add('hidden');
+
+                if (monitors.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+
+                displayMonitors(monitors);
+            } catch (error) {
+                loadingState.classList.add('hidden');
+                errorMessage.textContent = error.message;
+                errorMessage.classList.remove('hidden');
+            }
+        }
+
+        // Display monitors
+        function displayMonitors(monitors) {
+            const container = document.getElementById('monitorsContainer');
+            container.innerHTML = '';
+
+            monitors.forEach(monitor => {
+                const card = createMonitorCard(monitor);
+                container.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Create monitor card
+        function createMonitorCard(monitor) {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-all monitor-card';
+
+            const currentPrice = monitor.currentPrice || 0;
+            const targetPrice = monitor.targetPrice || 0;
+            const priceReached = currentPrice > 0 && currentPrice <= targetPrice;
+
+            card.innerHTML = `
+                <div class="flex items-start space-x-4 mb-4">
+                    <!-- Imagem do produto monitorado com efeito Blurred do HeroUI -->
+                    <div class="heroui-image-wrapper-monitor w-20 h-20 relative overflow-hidden rounded-lg flex-shrink-0">
+                        <!-- Imagem de fundo borrada -->
+                        <div class="heroui-blurred-img-monitor absolute inset-0">
+                            <img 
+                                src="${monitor.productImage || 'https://via.placeholder.com/80'}" 
+                                alt=""
+                                class="w-full h-full object-cover blur-md scale-110 opacity-60"
+                            >
+                        </div>
+                        <!-- Imagem principal -->
+                        <div class="heroui-img-monitor relative z-10 flex items-center justify-center h-full">
+                            <img 
+                                src="${monitor.productImage || 'https://via.placeholder.com/80'}" 
+                                alt="${monitor.productName}"
+                                class="object-contain max-w-full max-h-full p-1 monitor-product-img"
+                            >
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-gray-800 text-sm line-clamp-2 mb-2">${monitor.productName}</h3>
+                        ${priceReached ? '<span class="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full badge-success">🎯 Meta Atingida!</span>' : ''}
+                    </div>
+                </div>
+
+                <div class="space-y-3 mb-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Preço Atual:</span>
+                        <span class="font-bold text-lg ${priceReached ? 'text-green-600' : 'text-blue-600'}">
+                            R$ ${currentPrice.toFixed(2).replace('.', ',')}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-600">Preço Alvo:</span>
+                        <span class="font-bold text-lg text-purple-600">
+                            R$ ${targetPrice.toFixed(2).replace('.', ',')}
+                        </span>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                        <i data-lucide="clock" class="w-3 h-3 inline"></i>
+                        Última verificação: ${monitor.lastChecked ? new Date(monitor.lastChecked._seconds * 1000).toLocaleString('pt-BR') : 'Nunca'}
+                    </div>
+                </div>
+
+                <div class="flex space-x-2">
+                    <button 
+                        onclick="openEditModal('${monitor.id}', ${targetPrice})"
+                        class="flex-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-all text-sm flex items-center justify-center space-x-1"
+                    >
+                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                        <span>Editar</span>
+                    </button>
+                    <button 
+                        onclick="checkPrice('${monitor.id}')"
+                        class="flex-1 px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-all text-sm flex items-center justify-center space-x-1"
+                    >
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                        <span>Verificar</span>
+                    </button>
+                    <button 
+                        onclick="deleteMonitor('${monitor.id}')"
+                        class="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-all text-sm"
+                    >
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                ${monitor.productUrl ? `
+                    <a 
+                        href="${monitor.productUrl}" 
+                        target="_blank"
+                        class="mt-3 block w-full text-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all text-sm"
+                    >
+                        Ver Produto
+                    </a>
+                ` : ''}
+            `;
+
+            return card;
+        }
+
+        // Open edit modal
+        function openEditModal(monitorId, currentTargetPrice) {
+            document.getElementById('editMonitorId').value = monitorId;
+            document.getElementById('editTargetPrice').value = currentTargetPrice.toFixed(2);
+            document.getElementById('editModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        // Save new target price
+        async function saveNewTargetPrice() {
+            const monitorId = document.getElementById('editMonitorId').value;
+            const newPrice = document.getElementById('editTargetPrice').value;
+
+            if (!newPrice || parseFloat(newPrice) <= 0) {
+                Toast.error('Por favor, insira um preço válido');
+                return;
+            }
+
+            try {
+                await window.updateTargetPrice(monitorId, newPrice);
+                closeEditModal();
+                loadMonitors(currentUserEmail);
+                Toast.success('✅ Preço alvo atualizado com sucesso!');
+            } catch (error) {
+                Toast.error('Erro ao atualizar preço: ' + error.message);
+            }
+        }
+
+        // Delete monitor
+        async function deleteMonitor(monitorId) {
+            if (!confirm('Tem certeza que deseja remover este monitoramento?')) {
+                return;
+            }
+
+            try {
+                await window.removeMonitor(monitorId);
+                Toast.success('Monitoramento removido com sucesso');
+                loadMonitors(currentUserEmail);
+            } catch (error) {
+                Toast.error('Erro ao remover monitoramento: ' + error.message);
+            }
+        }
+
+        // Check price manually
+        async function checkPrice(monitorId) {
+            const button = event.target.closest('button');
+            const originalHTML = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i>';
+            lucide.createIcons();
+
+            try {
+                Toast.info('🔍 Verificando preço atual...', 2000);
+                const result = await window.checkPriceManually(monitorId);
+                
+                // Verificar se houve erro na verificação
+                if (result && result.result && result.result.error) {
+                    Toast.warning('⚠️ ' + result.result.error + '. Tente novamente mais tarde.', 5000);
+                } else if (result && result.result && result.result.checked) {
+                    Toast.success('✅ Preço verificado e atualizado!');
+                } else {
+                    Toast.warning('⚠️ Não foi possível verificar o preço no momento.', 4000);
+                }
+                
+                setTimeout(() => {
+                    loadMonitors(currentUserEmail);
+                    button.disabled = false;
+                    button.innerHTML = originalHTML;
+                    lucide.createIcons();
+                }, 2000);
+            } catch (error) {
+                Toast.error('Erro ao verificar preço: ' + (error.message || 'Erro desconhecido'));
+                button.disabled = false;
+                button.innerHTML = originalHTML;
+                lucide.createIcons();
+            }
+        }
+    </script>
+</body>
+</html>
+

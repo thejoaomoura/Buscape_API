@@ -96,3 +96,562 @@
 [data-theme="dark"] input::placeholder {
     color: #9ca3af !important;
 }
+
+/* Monitor Button Animation */
+@keyframes bellRing {
+    0%, 100% { transform: rotate(0deg); }
+    10%, 30% { transform: rotate(-10deg); }
+    20%, 40% { transform: rotate(10deg); }
+    50% { transform: rotate(0deg); }
+}
+
+.btn-monitor:hover i {
+    animation: bellRing 0.5s ease-in-out;
+}
+
+/* Modal Animations */
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+#monitorModal > div {
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+/* Loading Spinner */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Card Hover Effect with Gradient */
+.monitor-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.monitor-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.monitor-card:hover::before {
+    left: 100%;
+}
+
+/* Badge Pulse Animation */
+@keyframes badgePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.badge-success {
+    animation: badgePulse 2s ease-in-out infinite;
+}
+
+/* Floating Button */
+.floating-btn {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 40;
+}
+
+.floating-btn:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Line Clamp Utilities */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Gradient Text */
+.gradient-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: #2d2d2d;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #555;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+/* Toast Notifications */
+#toastContainer {
+    max-width: 400px;
+}
+
+.toast-enter {
+    animation: slideInRight 0.3s ease-out;
+}
+
+.toast-exit {
+    animation: slideOutRight 0.3s ease-in;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Quick Price Buttons */
+.quick-price-btn {
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.quick-price-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.quick-price-btn.selected {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #3b82f6;
+}
+
+/* Dark theme toast adjustments */
+[data-theme="dark"] #toastContainer {
+    filter: brightness(1.1);
+}
+
+/* Responsive toast on mobile */
+@media (max-width: 640px) {
+    #toastContainer {
+        left: 1rem;
+        right: 1rem;
+        max-width: none;
+    }
+}
+
+/* Modal Dark Theme Fixes */
+[data-theme="dark"] .modal-container {
+    background-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .modal-body {
+    background-color: #1f2937 !important;
+}
+
+[data-theme="dark"] .modal-product-card {
+    background-color: #374151 !important;
+    border: 1px solid #4b5563;
+}
+
+[data-theme="dark"] .modal-text {
+    color: #f3f4f6 !important;
+}
+
+[data-theme="dark"] .modal-container input,
+[data-theme="dark"] .modal-container select,
+[data-theme="dark"] .modal-container textarea {
+    background-color: #374151 !important;
+    color: #f3f4f6 !important;
+    border-color: #4b5563 !important;
+}
+
+[data-theme="dark"] .modal-container input::placeholder {
+    color: #9ca3af !important;
+}
+
+[data-theme="dark"] .modal-container label {
+    color: #e5e7eb !important;
+}
+
+/* Ajuste dos botões de escolha rápida no tema escuro */
+[data-theme="dark"] .modal-container button[onclick^="setQuickPrice"] {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+}
+
+[data-theme="dark"] .modal-container button[onclick^="setQuickPrice"]:hover {
+    background-color: #4b5563 !important;
+}
+
+/* Botões de escolha rápida com cores específicas no tema escuro */
+[data-theme="dark"] .modal-container button[onclick^="setQuickPrice"]:nth-child(1) {
+    background-color: rgba(34, 197, 94, 0.1) !important;
+    border-color: rgba(34, 197, 94, 0.3) !important;
+    color: #86efac !important;
+}
+
+[data-theme="dark"] .modal-container button[onclick^="setQuickPrice"]:nth-child(2) {
+    background-color: rgba(249, 115, 22, 0.1) !important;
+    border-color: rgba(249, 115, 22, 0.3) !important;
+    color: #fdba74 !important;
+}
+
+[data-theme="dark"] .modal-container button[onclick^="setQuickPrice"]:nth-child(3) {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #fca5a5 !important;
+}
+
+/* Texto de hint/descrição no modal */
+[data-theme="dark"] .modal-container .text-gray-500 {
+    color: #9ca3af !important;
+}
+
+/* Botão de cancelar no modal */
+[data-theme="dark"] .modal-container button[type="button"]:not([onclick^="setQuickPrice"]) {
+    background-color: transparent !important;
+    border-color: #4b5563 !important;
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .modal-container button[type="button"]:not([onclick^="setQuickPrice"]):hover {
+    background-color: #374151 !important;
+}
+
+/* Ícones no modal no tema escuro */
+[data-theme="dark"] .modal-container i[data-lucide] {
+    color: #e5e7eb;
+}
+
+/* Overlay do modal no tema escuro */
+[data-theme="dark"] #monitorModal {
+    background-color: rgba(0, 0, 0, 0.75) !important;
+}
+
+/* HeroUI Image Component - Blurred Effect */
+.heroui-image-wrapper {
+    background: linear-gradient(to bottom, rgba(240, 240, 240, 0.8), rgba(255, 255, 255, 0.9));
+}
+
+[data-theme="dark"] .heroui-image-wrapper {
+    background: linear-gradient(to bottom, rgba(30, 30, 30, 0.8), rgba(40, 40, 40, 0.9));
+}
+
+.heroui-blurred-img img {
+    filter: blur(20px);
+    transform: scale(1.1);
+}
+
+.heroui-img img.product-img {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    animation: fadeInImage 0.5s ease-in-out 0.2s forwards;
+}
+
+@keyframes fadeInImage {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Hover effect nos cards de produtos */
+.heroui-image-wrapper:hover .heroui-img img {
+    transform: scale(1.05);
+}
+
+/* Modal Image Blurred Effect */
+.heroui-image-wrapper-modal {
+    background: linear-gradient(to bottom, rgba(240, 240, 240, 0.8), rgba(255, 255, 255, 0.9));
+}
+
+[data-theme="dark"] .heroui-image-wrapper-modal {
+    background: linear-gradient(to bottom, rgba(55, 65, 81, 0.8), rgba(75, 85, 99, 0.9));
+}
+
+.heroui-blurred-img-modal img {
+    filter: blur(10px);
+}
+
+.heroui-img-modal img {
+    animation: fadeInImage 0.3s ease-in-out forwards;
+}
+
+/* Loading skeleton para imagens */
+.heroui-image-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0) 0%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer 2s infinite;
+    z-index: 1;
+}
+
+[data-theme="dark"] .heroui-image-wrapper::before {
+    background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0) 0%, 
+        rgba(255, 255, 255, 0.05) 50%, 
+        rgba(255, 255, 255, 0) 100%
+    );
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Remover shimmer quando imagem carregar */
+.heroui-image-wrapper.loaded::before {
+    display: none;
+}
+
+/* Monitor Page Image Blurred Effect */
+.heroui-image-wrapper-monitor {
+    background: linear-gradient(to bottom, rgba(240, 240, 240, 0.8), rgba(255, 255, 255, 0.9));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .heroui-image-wrapper-monitor {
+    background: linear-gradient(to bottom, rgba(55, 65, 81, 0.8), rgba(75, 85, 99, 0.9));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.heroui-blurred-img-monitor img {
+    filter: blur(8px);
+}
+
+.heroui-img-monitor img {
+    animation: fadeInImage 0.3s ease-in-out forwards;
+}
+
+/* Ajustes de tema escuro para textos nos cards de monitoramento */
+[data-theme="dark"] .monitor-card h3,
+[data-theme="dark"] .monitor-card .text-gray-800 {
+    color: #f3f4f6 !important;
+}
+
+[data-theme="dark"] .monitor-card .text-gray-600 {
+    color: #d1d5db !important;
+}
+
+[data-theme="dark"] .monitor-card .text-gray-500 {
+    color: #9ca3af !important;
+}
+
+/* Badge success com tema escuro */
+[data-theme="dark"] .badge-success {
+    background-color: rgba(34, 197, 94, 0.2) !important;
+    color: #86efac !important;
+}
+
+/* Botões de ação nos cards de monitoramento - Tema Escuro */
+[data-theme="dark"] .monitor-card button {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .monitor-card button:hover {
+    background-color: #4b5563 !important;
+}
+
+/* Botões específicos por cor */
+[data-theme="dark"] .monitor-card button.bg-blue-100 {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+    color: #93c5fd !important;
+}
+
+[data-theme="dark"] .monitor-card button.bg-blue-100:hover {
+    background-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+[data-theme="dark"] .monitor-card button.bg-purple-100 {
+    background-color: rgba(168, 85, 247, 0.15) !important;
+    border-color: rgba(168, 85, 247, 0.3) !important;
+    color: #d8b4fe !important;
+}
+
+[data-theme="dark"] .monitor-card button.bg-purple-100:hover {
+    background-color: rgba(168, 85, 247, 0.25) !important;
+}
+
+[data-theme="dark"] .monitor-card button.bg-red-100 {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #fca5a5 !important;
+}
+
+[data-theme="dark"] .monitor-card button.bg-red-100:hover {
+    background-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+/* Botão "Ver Produto" com gradiente - Tema Escuro */
+[data-theme="dark"] .monitor-card a.bg-gradient-to-r {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .monitor-card a.bg-gradient-to-r:hover {
+    background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%) !important;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Card de fundo no tema escuro */
+[data-theme="dark"] .monitor-card {
+    background-color: #1f2937 !important;
+    border: 1px solid #374151;
+}
+
+/* Ícones nos botões - Tema Escuro */
+[data-theme="dark"] .monitor-card button i[data-lucide] {
+    color: currentColor;
+}
+
+[data-theme="dark"] .monitor-card button.bg-blue-100 i[data-lucide] {
+    color: #93c5fd !important;
+}
+
+[data-theme="dark"] .monitor-card button.bg-purple-100 i[data-lucide] {
+    color: #d8b4fe !important;
+}
+
+[data-theme="dark"] .monitor-card button.bg-red-100 i[data-lucide] {
+    color: #fca5a5 !important;
+}
+
+/* Estados de preço no tema escuro */
+[data-theme="dark"] .monitor-card .text-green-600 {
+    color: #86efac !important;
+}
+
+[data-theme="dark"] .monitor-card .text-blue-600 {
+    color: #93c5fd !important;
+}
+
+[data-theme="dark"] .monitor-card .text-purple-600 {
+    color: #d8b4fe !important;
+}
+
+/* Modal de edição no tema escuro */
+[data-theme="dark"] #editModal .bg-white {
+    background-color: #1f2937 !important;
+}
+
+[data-theme="dark"] #editModal .bg-gradient-to-r {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+}
+
+[data-theme="dark"] #editModal label {
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] #editModal input {
+    background-color: #374151 !important;
+    color: #f3f4f6 !important;
+    border-color: #4b5563 !important;
+}
+
+[data-theme="dark"] #editModal button {
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] #editModal button.text-gray-600 {
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] #editModal button.text-gray-600:hover {
+    background-color: #374151 !important;
+}
+
+[data-theme="dark"] #editModal button.text-gray-700 {
+    color: #e5e7eb !important;
+    border-color: #4b5563 !important;
+}
+
+[data-theme="dark"] #editModal button.text-gray-700:hover {
+    background-color: #374151 !important;
+}
+
+[data-theme="dark"] #editModal button.hover\:bg-gray-50:hover {
+    background-color: #374151 !important;
+}
+
+[data-theme="dark"] #editModal button.bg-blue-600 {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+}
+
+[data-theme="dark"] #editModal button.bg-blue-600:hover {
+    background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%) !important;
+}
