@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
+    <title>🧪 Teste de Monitoramento - BuscapéAPI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="bg-gray-100 min-h-screen" data-theme="light">
+    <!-- Back to Main Button -->
+    <a 
+        href="/"
+        class="fixed top-4 right-4 z-50 px-4 py-2 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all flex items-center space-x-2"
+        title="Voltar para página principal"
+    >
+        <i data-lucide="home" class="w-5 h-5"></i>
+        <span>Voltar</span>
+    </a>
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4 rounded">
+                <p class="font-bold">⚠️ PÁGINA DE TESTE - EM DESENVOLVIMENTO</p>
+                <p class="text-sm">Esta página será deletada após validação do sistema.</p>
+            </div>
+            <h1 class="text-4xl font-bold text-blue-600 mb-2">
+                🧪 Teste de Monitoramento de Preços
+            </h1>
+            <p class="text-gray-600">Valide o envio de e-mails quando o preço atingir a meta</p>
+            <a href="/" class="inline-flex items-center text-blue-600 hover:text-blue-700 mt-2">
+                <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i>
+                Voltar para página principal
+            </a>
+        </header>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Seção 1: Criar Produto de Teste -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold mb-4 flex items-center">
+                    <i data-lucide="plus-circle" class="w-6 h-6 mr-2 text-green-600"></i>
+                    1. Criar Produto de Teste
+                </h2>
+                
+                <form id="testProductForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Seu E-mail (para receber notificação)
+                        </label>
+                        <input 
+                            type="email" 
+                            id="testEmail"
+                            placeholder="seu@email.com"
+                            required
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Nome do Produto (Fictício)
+                        </label>
+                        <input 
+                            type="text" 
+                            id="testProductName"
+                            value="Produto de Teste - Notebook Gamer XYZ"
+                            required
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Preço Atual Simulado (R$)
+                        </label>
+                        <input 
+                            type="number" 
+                            id="testCurrentPrice"
+                            value="2500.00"
+                            step="0.01"
+                            required
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Preço Alvo (R$)
+                        </label>
+                        <input 
+                            type="number" 
+                            id="testTargetPrice"
+                            value="2600.00"
+                            step="0.01"
+                            required
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                        <p class="text-xs text-gray-500 mt-1">
+                            💡 Dica: Coloque o preço alvo MAIOR que o atual para testar o envio de e-mail
+                        </p>
+                    </div>
+
+                    <button 
+                        type="submit"
+                        class="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-all font-medium flex items-center justify-center space-x-2"
+                    >
+                        <i data-lucide="plus" class="w-5 h-5"></i>
+                        <span>Adicionar ao Monitoramento</span>
+                    </button>
+                </form>
+
+                <div id="createResult" class="hidden mt-4 p-3 rounded-lg"></div>
+            </div>
+
+            <!-- Seção 2: Simular Verificação de Preço -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold mb-4 flex items-center">
+                    <i data-lucide="refresh-cw" class="w-6 h-6 mr-2 text-blue-600"></i>
+                    2. Simular Verificação de Preço
+                </h2>
+
+                <div id="monitorInfo" class="hidden mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <p class="text-sm font-medium text-blue-800">Monitor ID:</p>
+                    <p id="monitorId" class="font-mono text-xs text-blue-600 break-all"></p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Novo Preço Simulado (R$)
+                        </label>
+                        <input 
+                            type="number" 
+                            id="simulatedPrice"
+                            placeholder="Ex: 2400.00"
+                            step="0.01"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                        <p class="text-xs text-gray-500 mt-1">
+                            💡 Coloque um valor MENOR ou IGUAL ao preço alvo para disparar o e-mail
+                        </p>
+                    </div>
+
+                    <button 
+                        id="simulateBtn"
+                        disabled
+                        class="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-all font-medium flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <i data-lucide="play" class="w-5 h-5"></i>
+                        <span>Simular Verificação e Enviar E-mail</span>
+                    </button>
+
+                    <div id="simulateResult" class="hidden mt-4 p-3 rounded-lg"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção 3: Produtos de Teste Monitorados -->
+        <div class="mt-6 bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i data-lucide="list" class="w-6 h-6 mr-2 text-purple-600"></i>
+                    3. Produtos de Teste Monitorados
+                </h2>
+                <div class="flex space-x-2">
+                    <button 
+                        id="deleteAllTestBtn"
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all flex items-center space-x-2"
+                    >
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Deletar Todos</span>
+                    </button>
+                    <button 
+                        id="refreshBtn"
+                        class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all flex items-center space-x-2"
+                    >
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                        <span>Atualizar</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="testMonitorsList" class="space-y-3">
+                <p class="text-gray-500 text-center py-8">Nenhum produto de teste monitorado ainda.</p>
+            </div>
+        </div>
+
+        <!-- Seção 4: Logs -->
+        <div class="mt-6 bg-gray-900 text-green-400 rounded-lg shadow-md p-6 font-mono text-sm">
+            <h2 class="text-xl font-bold mb-4 flex items-center text-white">
+                <i data-lucide="terminal" class="w-6 h-6 mr-2"></i>
+                Console de Logs
+            </h2>
+            <div id="console" class="space-y-1 max-h-96 overflow-y-auto">
+                <p class="text-gray-500">[Aguardando ações...]</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div id="deleteConfirmModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
+            <!-- Header do Modal -->
+            <div class="bg-gradient-to-r from-red-600 to-red-700 text-white p-6 rounded-t-2xl">
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+                    <h3 class="text-2xl font-bold">Confirmar Exclusão</h3>
+                </div>
+            </div>
+
+            <!-- Corpo do Modal -->
+            <div class="p-6">
+                <p class="text-gray-700 mb-2 text-lg font-semibold">
+                    Tem certeza que deseja deletar TODOS os produtos de teste?
+                </p>
+                <p class="text-gray-600 text-sm mb-4">
+                    Esta ação é irreversível e irá remover permanentemente:
+                </p>
+                
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                    <ul class="space-y-2 text-sm text-red-800">
+                        <li class="flex items-center">
+                            <i data-lucide="x-circle" class="w-4 h-4 mr-2"></i>
+                            <span id="testProductsCount">Carregando...</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-lucide="database" class="w-4 h-4 mr-2"></i>
+                            Todos os dados do Firestore
+                        </li>
+                        <li class="flex items-center">
+                            <i data-lucide="mail" class="w-4 h-4 mr-2"></i>
+                            Histórico de notificações
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Botões -->
+                <div class="flex space-x-3">
+                    <button 
+                        onclick="closeDeleteModal()"
+                        class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-all"
+                    >
+                        Cancelar
+                    </button>
+                    <button 
+                        onclick="confirmDeleteAll()"
+                        class="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-all flex items-center justify-center space-x-2"
+                    >
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <span>Deletar Tudo</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:5173/api'
+            : 'https://buscape-search-api.vercel.app/api';
+
+        let currentMonitorId = null;
+        let currentEmail = null;
+
+        // Função para adicionar log
+        function addLog(message, type = 'info') {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString('pt-BR');
+            const colors = {
+                info: 'text-blue-400',
+                success: 'text-green-400',
+                error: 'text-red-400',
+                warning: 'text-yellow-400'
+            };
+            
+            const log = document.createElement('p');
+            log.className = colors[type];
+            log.textContent = `[${timestamp}] ${message}`;
+            console.appendChild(log);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        // Função para mostrar resultado
+        function showResult(elementId, message, type = 'success') {
+            const element = document.getElementById(elementId);
+            const colors = {
+                success: 'bg-green-100 text-green-800 border border-green-200',
+                error: 'bg-red-100 text-red-800 border border-red-200',
+                warning: 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+            };
+            
+            element.className = `mt-4 p-3 rounded-lg ${colors[type]}`;
+            element.textContent = message;
+            element.classList.remove('hidden');
+        }
+
+        // 1. Criar produto de teste
+        document.getElementById('testProductForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('testEmail').value;
+            const productName = document.getElementById('testProductName').value;
+            const currentPrice = parseFloat(document.getElementById('testCurrentPrice').value);
+            const targetPrice = parseFloat(document.getElementById('testTargetPrice').value);
+
+            currentEmail = email;
+
+            addLog('Criando produto de teste...', 'info');
+
+            try {
+                const response = await fetch(`${API_URL}/monitor`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userEmail: email,
+                        productName: `[TESTE] ${productName}`,
+                        productUrl: 'https://www.buscape.com.br/test',
+                        currentPrice: currentPrice,
+                        targetPrice: targetPrice,
+                        productImage: 'https://via.placeholder.com/200'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentMonitorId = data.monitorId;
+                    document.getElementById('monitorId').textContent = currentMonitorId;
+                    document.getElementById('monitorInfo').classList.remove('hidden');
+                    document.getElementById('simulateBtn').disabled = false;
+                    
+                    showResult('createResult', `✅ Produto criado com sucesso! ID: ${currentMonitorId}`, 'success');
+                    addLog(`Produto criado: ${currentMonitorId}`, 'success');
+                    
+                    loadTestMonitors();
+                } else {
+                    throw new Error(data.error || 'Erro ao criar produto');
+                }
+            } catch (error) {
+                showResult('createResult', `❌ Erro: ${error.message}`, 'error');
+                addLog(`Erro ao criar produto: ${error.message}`, 'error');
+            }
+        });
+
+        // 2. Simular verificação
+        document.getElementById('simulateBtn').addEventListener('click', async () => {
+            if (!currentMonitorId) {
+                alert('Crie um produto de teste primeiro!');
+                return;
+            }
+
+            const simulatedPrice = parseFloat(document.getElementById('simulatedPrice').value);
+            if (!simulatedPrice || simulatedPrice <= 0) {
+                alert('Digite um preço válido para simular!');
+                return;
+            }
+
+            addLog(`Simulando verificação com preço: R$ ${simulatedPrice.toFixed(2)}`, 'info');
+
+            try {
+                // Primeiro, atualizar o preço atual do monitor
+                const updateResponse = await fetch(`${API_URL}/monitor/${currentMonitorId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ currentPrice: simulatedPrice })
+                });
+
+                if (!updateResponse.ok) {
+                    throw new Error('Erro ao atualizar preço');
+                }
+
+                addLog('Preço atualizado no Firestore', 'success');
+
+                // Agora verificar o monitor (usando endpoint de teste que não faz scraping)
+                const checkResponse = await fetch(`${API_URL}/monitor/check-test/${currentMonitorId}`, {
+                    method: 'POST'
+                });
+
+                const checkData = await checkResponse.json();
+
+                if (checkResponse.ok) {
+                    if (checkData.result.notified) {
+                        showResult('simulateResult', '🎉 E-MAIL ENVIADO COM SUCESSO! Verifique sua caixa de entrada.', 'success');
+                        addLog('✅ E-mail de notificação enviado!', 'success');
+                    } else {
+                        showResult('simulateResult', '⚠️ Preço verificado, mas ainda não atingiu a meta. E-mail não enviado.', 'warning');
+                        addLog('Preço não atingiu a meta ainda', 'warning');
+                    }
+                    
+                    loadTestMonitors();
+                } else {
+                    throw new Error(checkData.error || 'Erro ao verificar');
+                }
+            } catch (error) {
+                showResult('simulateResult', `❌ Erro: ${error.message}`, 'error');
+                addLog(`Erro na simulação: ${error.message}`, 'error');
+            }
+        });
+
+        // 3. Carregar produtos de teste
+        async function loadTestMonitors() {
+            if (!currentEmail) return;
+
+            addLog('Carregando produtos de teste...', 'info');
+
+            try {
+                const response = await fetch(`${API_URL}/monitor?email=${encodeURIComponent(currentEmail)}`);
+                const data = await response.json();
+
+                const list = document.getElementById('testMonitorsList');
+                
+                if (data.monitors && data.monitors.length > 0) {
+                    const testMonitors = data.monitors.filter(m => m.productName.includes('[TESTE]'));
+                    
+                    if (testMonitors.length === 0) {
+                        list.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum produto de teste encontrado.</p>';
+                        return;
+                    }
+
+                    list.innerHTML = testMonitors.map(monitor => `
+                        <div class="border rounded-lg p-4 hover:shadow-md transition-all">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-gray-800">${monitor.productName}</h3>
+                                    <p class="text-xs text-gray-500 font-mono mt-1">ID: ${monitor.id}</p>
+                                    <div class="mt-2 flex space-x-4 text-sm">
+                                        <span class="text-blue-600">Atual: R$ ${(monitor.currentPrice || 0).toFixed(2)}</span>
+                                        <span class="text-purple-600">Alvo: R$ ${(monitor.targetPrice || 0).toFixed(2)}</span>
+                                        ${monitor.notified ? '<span class="text-green-600 font-bold">✅ Notificado</span>' : '<span class="text-gray-500">⏳ Aguardando</span>'}
+                                    </div>
+                                </div>
+                                <button 
+                                    onclick="deleteTestMonitor('${monitor.id}')"
+                                    class="px-3 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 text-sm"
+                                >
+                                    Deletar
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    addLog(`${testMonitors.length} produto(s) de teste carregado(s)`, 'success');
+                } else {
+                    list.innerHTML = '<p class="text-gray-500 text-center py-8">Nenhum produto de teste encontrado.</p>';
+                }
+            } catch (error) {
+                addLog(`Erro ao carregar monitores: ${error.message}`, 'error');
+            }
+        }
+
+        // Deletar monitor de teste
+        window.deleteTestMonitor = async (id) => {
+            if (!confirm('Deletar este monitor de teste?')) return;
+
+            addLog(`Deletando monitor: ${id}`, 'info');
+
+            try {
+                const response = await fetch(`${API_URL}/monitor/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    addLog('Monitor deletado com sucesso', 'success');
+                    loadTestMonitors();
+                } else {
+                    throw new Error('Erro ao deletar');
+                }
+            } catch (error) {
+                addLog(`Erro ao deletar: ${error.message}`, 'error');
+            }
+        };
+
+        // Botão refresh
+        document.getElementById('refreshBtn').addEventListener('click', loadTestMonitors);
+
+        // Botão deletar todos
+        document.getElementById('deleteAllTestBtn').addEventListener('click', openDeleteModal);
+
+        // Função para abrir modal de confirmação
+        async function openDeleteModal() {
+            if (!currentEmail) {
+                alert('Digite seu e-mail primeiro!');
+                return;
+            }
+
+            const modal = document.getElementById('deleteConfirmModal');
+            
+            // Carregar quantidade de produtos de teste
+            try {
+                const response = await fetch(`${API_URL}/monitor?email=${encodeURIComponent(currentEmail)}`);
+                const data = await response.json();
+                
+                if (data.monitors && data.monitors.length > 0) {
+                    const testMonitors = data.monitors.filter(m => m.productName.includes('[TESTE]'));
+                    const countSpan = document.getElementById('testProductsCount');
+                    countSpan.textContent = `${testMonitors.length} produto(s) de teste`;
+                    
+                    if (testMonitors.length === 0) {
+                        alert('Não há produtos de teste para deletar.');
+                        return;
+                    }
+                } else {
+                    alert('Não há produtos para deletar.');
+                    return;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar contagem:', error);
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => lucide.createIcons(), 100);
+        }
+
+        // Função para fechar modal
+        function closeDeleteModal() {
+            document.getElementById('deleteConfirmModal').classList.add('hidden');
+        }
+
+        // Função para confirmar e deletar todos
+        async function confirmDeleteAll() {
+            addLog('🗑️ Iniciando exclusão de TODOS os produtos de teste...', 'warning');
+            
+            const modal = document.getElementById('deleteConfirmModal');
+            const deleteBtn = modal.querySelector('button[onclick="confirmDeleteAll()"]');
+            const originalHTML = deleteBtn.innerHTML;
+            
+            deleteBtn.disabled = true;
+            deleteBtn.innerHTML = '<i data-lucide="loader" class="w-4 h-4 animate-spin"></i><span>Deletando...</span>';
+            lucide.createIcons();
+
+            try {
+                // Buscar todos os produtos de teste
+                const response = await fetch(`${API_URL}/monitor?email=${encodeURIComponent(currentEmail)}`);
+                const data = await response.json();
+
+                if (data.monitors && data.monitors.length > 0) {
+                    const testMonitors = data.monitors.filter(m => m.productName.includes('[TESTE]'));
+                    
+                    let deletedCount = 0;
+                    let errorCount = 0;
+
+                    // Deletar cada produto de teste
+                    for (const monitor of testMonitors) {
+                        try {
+                            const deleteResponse = await fetch(`${API_URL}/monitor/${monitor.id}`, {
+                                method: 'DELETE'
+                            });
+
+                            if (deleteResponse.ok) {
+                                deletedCount++;
+                                addLog(`✅ Deletado: ${monitor.productName}`, 'success');
+                            } else {
+                                errorCount++;
+                                addLog(`❌ Erro ao deletar: ${monitor.id}`, 'error');
+                            }
+                        } catch (error) {
+                            errorCount++;
+                            addLog(`❌ Erro: ${error.message}`, 'error');
+                        }
+                    }
+
+                    // Mostrar resultado
+                    if (deletedCount > 0) {
+                        addLog(`🎉 Total deletado: ${deletedCount} produto(s)`, 'success');
+                        alert(`✅ ${deletedCount} produto(s) de teste deletado(s) com sucesso!${errorCount > 0 ? `\n⚠️ ${errorCount} erro(s) encontrado(s).` : ''}`);
+                    } else {
+                        addLog('⚠️ Nenhum produto foi deletado', 'warning');
+                        alert('Nenhum produto foi deletado.');
+                    }
+
+                    // Recarregar lista
+                    loadTestMonitors();
+                } else {
+                    addLog('⚠️ Nenhum produto encontrado', 'warning');
+                }
+
+                closeDeleteModal();
+            } catch (error) {
+                addLog(`❌ Erro ao deletar produtos: ${error.message}`, 'error');
+                alert('Erro ao deletar produtos: ' + error.message);
+            } finally {
+                deleteBtn.disabled = false;
+                deleteBtn.innerHTML = originalHTML;
+                lucide.createIcons();
+            }
+        }
+
+        // Carregar e-mail do localStorage
+        const savedEmail = localStorage.getItem('userEmail');
+        if (savedEmail) {
+            document.getElementById('testEmail').value = savedEmail;
+            currentEmail = savedEmail;
+        }
+
+        addLog('Página de teste carregada', 'success');
+    </script>
+</body>
+</html>
+

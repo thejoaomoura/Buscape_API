@@ -90,29 +90,46 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-// PUT - Atualizar preço alvo
+// PUT - Atualizar preço alvo ou preço atual (para testes)
 router.put('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { targetPrice } = req.body;
+        const { targetPrice, currentPrice } = req.body;
 
         if (!id) {
             return res.status(400).json({ error: 'ID do monitor não fornecido' });
         }
 
-        if (!targetPrice || parseFloat(targetPrice) <= 0) {
-            return res.status(400).json({ error: 'Preço alvo inválido' });
+        // Se vier currentPrice, atualizar o preço atual (para testes)
+        if (currentPrice !== undefined) {
+            if (parseFloat(currentPrice) < 0) {
+                return res.status(400).json({ error: 'Preço atual inválido' });
+            }
+            await priceMonitorService.updateCurrentPriceDirectly(id, currentPrice);
+            
+            return res.json({
+                success: true,
+                message: 'Preço atual atualizado com sucesso'
+            });
         }
 
-        await priceMonitorService.updateTargetPrice(id, targetPrice);
+        // Se vier targetPrice, atualizar o preço alvo
+        if (targetPrice !== undefined) {
+            if (parseFloat(targetPrice) <= 0) {
+                return res.status(400).json({ error: 'Preço alvo inválido' });
+            }
+            await priceMonitorService.updateTargetPrice(id, targetPrice);
 
-        res.json({
-            success: true,
-            message: 'Preço alvo atualizado com sucesso'
-        });
+            return res.json({
+                success: true,
+                message: 'Preço alvo atualizado com sucesso'
+            });
+        }
+
+        return res.status(400).json({ error: 'Nenhum campo para atualizar fornecido' });
     } catch (error) {
-        console.error('Erro ao atualizar preço alvo:', error);
-        res.status(500).json({ error: 'Erro ao atualizar preço alvo' });
+        console.error('Erro ao atualizar monitor:', error);
+        res.status(500).json({ error: 'Erro ao atualizar monitor' });
     }
 });
 
@@ -195,6 +212,75 @@ router.post('/check/:id', async (req, res) => {
     } catch (error) {
         console.error('Erro ao verificar preço:', error);
         res.status(500).json({ error: 'Erro ao verificar preço' });
+    }
+});
+
+// POST - Verificar preço de teste (sem scraping, apenas verifica se atingiu meta e envia e-mail)
+router.post('/check-test/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const monitors = await priceMonitorService.getAllActiveMonitors();
+        const monitor = monitors.find(m => m.id === id);
+
+        if (!monitor) {
+            return res.status(404).json({ error: 'Monitor não encontrado' });
+        }
+
+        console.log(`🧪 [TESTE] Verificando monitor: ${monitor.productName}`);
+        
+        // Para testes, não fazemos scraping, usamos o preço atual já salvo
+        const currentPrice = monitor.currentPrice || 0;
+        const targetPrice = monitor.targetPrice || 0;
+
+        console.log(`🧪 Preço atual: R$ ${currentPrice.toFixed(2)} | Preço alvo: R$ ${targetPrice.toFixed(2)}`);
+
+        // Verificar se atingiu o preço alvo e ainda não foi notificado
+        if (!monitor.notified && currentPrice > 0 && currentPrice <= targetPrice) {
+            console.log(`🎯 Preço alvo atingido! Enviando e-mail...`);
+            
+            // Enviar notificação por e-mail
+            const emailData = {
+                productName: monitor.productName,
+                productImage: monitor.productImage,
+                currentPrice: `R$ ${currentPrice.toFixed(2).replace('.', ',')}`,
+                targetPrice: `R$ ${targetPrice.toFixed(2).replace('.', ',')}`,
+                productUrl: monitor.productUrl,
+                monitorId: monitor.id
+            };
+
+            const { sendEmail } = require('../config/resend.config');
+            await sendEmail(monitor.userEmail, 'priceAlert', emailData);
+            
+            // Marcar como notificado
+            await priceMonitorService.markAsNotified(monitor.id);
+
+            return res.json({
+                success: true,
+                result: {
+                    checked: true,
+                    notified: true,
+                    currentPrice,
+                    targetPrice
+                }
+            });
+        }
+
+        res.json({
+            success: true,
+            result: {
+                checked: true,
+                notified: false,
+                currentPrice,
+                targetPrice,
+                message: currentPrice > targetPrice ? 'Preço ainda não atingiu a meta' : 'Já foi notificado anteriormente'
+            }
+        });
+    } catch (error) {
+        console.error('❌ Erro ao verificar preço de teste:', error);
+        res.status(500).json({ 
+            error: 'Erro ao verificar preço de teste',
+            details: error.message 
+        });
     }
 });
 

@@ -319,6 +319,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize theme
     initializeTheme();
 
+    // Show test button only in localhost
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        const testBtn = document.getElementById('testPageBtn');
+        if (testBtn) {
+            testBtn.classList.remove('hidden');
+        }
+    }
+
     // Event Listeners
     searchButton.addEventListener('click', () => {
         const query = searchInput.value.trim();

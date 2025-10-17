@@ -86,6 +86,21 @@ class PriceMonitorService {
         }
     }
 
+    async updateCurrentPriceDirectly(monitorId, newCurrentPrice) {
+        try {
+            const db = getFirestore();
+            await db.collection(this.collection).doc(monitorId).update({
+                currentPrice: parseFloat(newCurrentPrice),
+                lastChecked: new Date()
+            });
+            console.log(`✅ Preço atual atualizado diretamente para monitor ${monitorId}`);
+            return { success: true };
+        } catch (error) {
+            console.error('❌ Erro ao atualizar preço atual:', error);
+            throw error;
+        }
+    }
+
     async updateCurrentPrice(monitorId, newPrice) {
         try {
             const db = getFirestore();
