@@ -9,10 +9,14 @@ class PriceCheckerService {
         this.baseUrl = config.baseUrl;
     }
 
-    // Extrai o preço numérico de uma string
+    // Extrai o preço numérico de uma string. Considera apenas o primeiro valor
+    // monetário (ex.: "R$ 2.899,90à vista ou 10x..." -> 2899.90).
     parsePrice(priceString) {
         if (!priceString) return 0;
-        const cleanPrice = priceString.replace(/[^0-9,]/g, '').replace(',', '.');
+        const match = priceString.match(/R\$\s*([\d.,]+)/);
+        const raw = match ? match[1] : priceString;
+        // Remove separador de milhar (.) e troca vírgula decimal por ponto
+        const cleanPrice = raw.replace(/\./g, '').replace(',', '.').replace(/[^0-9.]/g, '');
         return parseFloat(cleanPrice) || 0;
     }
 
@@ -32,18 +36,18 @@ class PriceCheckerService {
                     timeout: 10000
                 });
                 const $ = cheerio.load(response.data);
-                
+
                 // Tentar múltiplos seletores para encontrar o preço
                 let price = null;
-                
-                // Seletor 1: data-testid
-                price = $('[data-testid="product-card::price"]').first().text().trim();
-                
-                // Seletor 2: classe ProductCard
+
+                // Seletor 1: página de produto (lista de ofertas)
+                price = $('[data-testid="offer-price"]').first().text().trim();
+
+                // Seletor 2: página de busca / card de produto
                 if (!price) {
-                    price = $('.ProductCard_ProductCard_Price__text').first().text().trim();
+                    price = $('[data-testid="product-card::price"]').first().text().trim();
                 }
-                
+
                 // Seletor 3: buscar qualquer elemento com "R$"
                 if (!price) {
                     $('*').each((i, elem) => {
