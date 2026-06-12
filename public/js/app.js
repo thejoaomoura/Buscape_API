@@ -133,29 +133,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             card.className = 'flex flex-col items-center justify-center bg-white border rounded-lg shadow-md p-4 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1';
             
-            // Função auxiliar para gerar as estrelas
-            const generateStars = (rating) => {
-                const ratingNumber = parseFloat(rating) || 0;
-                const fullStars = Math.min(Math.floor(ratingNumber), 5);
+            // Renderiza o bloco de avaliação. A API retorna algo como "4.7 (172)"
+            // ou string vazia quando o produto ainda não tem avaliações (ex.:
+            // lançamentos). Nesse caso mostramos "Sem avaliações" em vez de
+            // estrelas vazias com "()".
+            const STAR_PATH = 'M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.908c.969 0 1.371 1.24.588 1.81l-3.974 2.89a1 1 0 00-.364 1.118l1.518 4.675c.3.921-.755 1.688-1.54 1.118l-3.974-2.89a1 1 0 00-1.176 0l-3.974 2.89c-.784.57-1.838-.197-1.54-1.118l1.518-4.675a1 1 0 00-.364-1.118l-3.974-2.89c-.783-.57-.38-1.81.588-1.81h4.908a1 1 0 00.95-.69l1.518-4.674z';
+            const renderRating = (rating) => {
+                const str = (rating || '').trim();
+                const score = parseFloat(str.replace(',', '.')) || 0;
+                const countMatch = str.match(/\((\d[\d.]*)\)/);
+                const count = countMatch ? countMatch[1] : null;
+
+                // Sem avaliação: não renderiza estrelas (nem espaço reservado)
+                if (!str || score <= 0) {
+                    return '';
+                }
+
+                const fullStars = Math.min(Math.round(score), 5);
                 let starsHtml = '';
-                
-                // Estrelas cheias
-                for (let i = 0; i < fullStars; i++) {
-                    starsHtml += `
-                        <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.908c.969 0 1.371 1.24.588 1.81l-3.974 2.89a1 1 0 00-.364 1.118l1.518 4.675c.3.921-.755 1.688-1.54 1.118l-3.974-2.89a1 1 0 00-1.176 0l-3.974 2.89c-.784.57-1.838-.197-1.54-1.118l1.518-4.675a1 1 0 00-.364-1.118l-3.974-2.89c-.783-.57-.38-1.81.588-1.81h4.908a1 1 0 00.95-.69l1.518-4.674z" />
-                        </svg>`;
+                for (let i = 0; i < 5; i++) {
+                    const cls = i < fullStars ? 'text-yellow-400 fill-current' : 'text-gray-300';
+                    starsHtml += `<svg class="w-4 h-4 ${cls}" viewBox="0 0 20 20"><path d="${STAR_PATH}" /></svg>`;
                 }
-                
-                // Estrelas vazias
-                for (let i = fullStars; i < 5; i++) {
-                    starsHtml += `
-                        <svg class="w-4 h-4 text-gray-300" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.518 4.674a1 1 0 00.95.69h4.908c.969 0 1.371 1.24.588 1.81l-3.974 2.89a1 1 0 00-.364 1.118l1.518 4.675c.3.921-.755 1.688-1.54 1.118l-3.974-2.89a1 1 0 00-1.176 0l-3.974 2.89c-.784.57-1.838-.197-1.54-1.118l1.518-4.675a1 1 0 00-.364-1.118l-3.974-2.89c-.783-.57-.38-1.81.588-1.81h4.908a1 1 0 00.95-.69l1.518-4.674z" />
-                        </svg>`;
-                }
-                
-                return starsHtml;
+
+                const label = count ? `${score.toFixed(1)} (${count})` : score.toFixed(1);
+                return `
+                    <div class="flex items-center justify-center mb-2">
+                        <div class="flex items-center">${starsHtml}</div>
+                        <span class="text-sm text-gray-600 ml-1">${label}</span>
+                    </div>`;
             };
 
             card.innerHTML = `
@@ -184,30 +190,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 <!-- Informações do produto -->
                 <div class="mt-2 text-center w-full">
                     <h2 class="text-lg font-medium text-gray-800 line-clamp-2 h-14 mb-2">${product.name}</h2>
-                    <div class="flex items-center justify-center mb-2">
-                        <div class="flex items-center">
-                            ${generateStars(product.rating)}
-                        </div>
-                        <span class="text-sm text-gray-600 ml-1">(${product.rating})</span>
-                    </div>
+                    ${renderRating(product.rating)}
                     <p class="text-sm text-gray-500">Menor preço disponível</p>
                     <p class="text-2xl font-bold text-blue-600 mt-2">${product.price}</p>
                     ${product.installment ? `<p class="text-sm text-gray-500 mt-1">${product.installment}</p>` : ''}
-                    <div class="mt-4 flex space-x-2">
-                        <button 
+                    <div class="mt-4 flex flex-col sm:flex-row gap-2">
+                        <button
                             onclick="window.openMonitorModal(${JSON.stringify(product).replace(/"/g, '&quot;')})"
-                            class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-full hover:from-purple-700 hover:to-pink-700 transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg"
+                            class="w-full sm:flex-1 min-w-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-2 text-sm rounded-full hover:from-purple-700 hover:to-pink-700 transition-all duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap shadow-md hover:shadow-lg"
                             title="Monitorar preço deste produto"
                         >
-                            <i data-lucide="bell" class="w-4 h-4"></i>
+                            <i data-lucide="bell" class="w-4 h-4 flex-shrink-0"></i>
                             <span>Monitorar</span>
                         </button>
-                        <button 
+                        <button
                             onclick="window.open('${product.link}', '_blank')"
-                            class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition-colors duration-300 flex items-center justify-center space-x-2"
+                            class="w-full sm:flex-1 min-w-0 bg-blue-600 text-white px-3 py-2 text-sm rounded-full hover:bg-blue-700 transition-colors duration-300 flex items-center justify-center gap-1.5 whitespace-nowrap"
                         >
                             <span>Ver Produto</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
                         </button>
